@@ -14,9 +14,9 @@ library" pattern as every previous step:
   (a) our from-scratch softmax matches torch.softmax exactly
   (b) our from-scratch cross-entropy loss (the thing training would
       actually minimize) matches torch.nn.functional.cross_entropy exactly
-Verifying (b) matters because next week's training step will lean on
-exactly this loss function -- if it's subtly wrong here, everything built
-on top of it later would be wrong too.
+Verifying (b) matters because ANY model training (from-scratch or
+fine-tuning) leans on exactly this loss function -- if it's subtly wrong
+here, everything built on top of it later would be wrong too.
 """
 
 import sys

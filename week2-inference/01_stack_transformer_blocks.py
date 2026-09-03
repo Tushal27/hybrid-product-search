@@ -156,4 +156,6 @@ print("This IS the 'body' of a GPT model. What's missing to turn it into an actu
 print("language model: (1) a real tokenizer mapping text -> token_ids (week 1 built")
 print("this already), (2) an output head projecting embed_dim -> vocab_size logits")
 print("so we get a probability distribution over the NEXT token (step 2), and")
-print("(3) training the weights on real text instead of random init (a later week).")
+print("(3) real weights instead of random init -- either trained from scratch, or")
+print("(the far more common path in practice) loaded from an already-pretrained")
+print("open model, which is what most of this pipeline is actually built for.")

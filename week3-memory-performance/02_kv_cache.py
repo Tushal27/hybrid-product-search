@@ -1,6 +1,12 @@
 """
-WEEK 2, STEP 4: KV caching -- why real inference servers don't recompute
+WEEK 3, STEP 2: KV caching -- why real inference servers don't recompute
 the whole sequence from scratch at every generated token.
+
+This picks up right where week 2's inference pipeline left off: that
+pipeline works, but at every generation step it reprocesses the ENTIRE
+sequence from position 0. This step is the first "memory & performance"
+optimization on top of a correct pipeline -- same category as context
+windows, prompt caching, and quantization (the rest of week 3).
 
 NAIVE autoregressive generation: to generate token n+1, run the WHOLE
 sequence (tokens 0..n) through the model again. Wasteful -- because of the
