@@ -30,6 +30,14 @@ TOOLS = {
             "required": ["country"],
         },
     },
+    "string_length": {
+        "description": "Count the number of characters in a string",
+        "inputSchema": {
+            "type": "object",
+            "properties": {"text": {"type": "string"}},
+            "required": ["text"],
+        },
+    },
 }
 
 CAPITALS = {"japan": "Tokyo", "france": "Paris", "spain": "Madrid", "italy": "Rome", "canada": "Ottawa"}
@@ -43,6 +51,8 @@ def call_tool(name, arguments):
         if country not in CAPITALS:
             raise ValueError(f"no capital on file for {arguments['country']!r}")
         return CAPITALS[country]
+    if name == "string_length":
+        return len(arguments["text"])
     raise ValueError(f"unknown tool: {name}")
 
 
