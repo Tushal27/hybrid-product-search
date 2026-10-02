@@ -1,0 +1,7 @@
+{
+  "dense_weight": 2.0,
+  "bm25_weight": 1.0,
+  "rrf_k": 10,
+  "rerank_top": 50,
+  "rerank_blend": 0.5
+}

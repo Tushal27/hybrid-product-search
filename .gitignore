@@ -2,3 +2,9 @@
 __pycache__/
 *.pyc
 assistant/data/*.json
+llama-cpp/
+translator/lora_en_fr.pt
+translator/train.log
+product_search/data/
+product_search/index/
+*.log

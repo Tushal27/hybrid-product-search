@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Toy Search</title>
+<style>
+  :root {
+    --bg:#f5f4f0; --card:#ffffff; --ink:#1d1c1a; --muted:#6f6b63; --line:#e4e1d9;
+    --accent:#2f4fd8; --accent-ink:#ffffff; --good:#1f7a4d; --warn:#b4531f; --chip:#eceae3;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg:#131312; --card:#1c1c1a; --ink:#ecebe6; --muted:#9b978d; --line:#333230;
+            --accent:#8196f7; --accent-ink:#0f1220; --good:#59c08b; --warn:#e29a63; --chip:#2a2926; }
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif; }
+  header { padding:22px 16px 6px; max-width:1280px; margin:0 auto; }
+  h1 { font-size:1.35rem; margin:0; letter-spacing:-.01em; }
+  .sub { color:var(--muted); font-size:.88rem; margin-top:2px; }
+  main { max-width:1280px; margin:0 auto; padding:10px 16px 48px; }
+
+  form { display:flex; gap:8px; margin:14px 0 10px; }
+  input[type=search] { flex:1; font:inherit; padding:12px 14px; border-radius:10px; border:1px solid var(--line);
+    background:var(--card); color:var(--ink); min-width:0; }
+  input:focus, select:focus { outline:2px solid var(--accent); outline-offset:1px; }
+  button { font:inherit; cursor:pointer; border-radius:10px; border:1px solid var(--line); background:var(--card); color:var(--ink); padding:10px 14px; }
+  button.primary { background:var(--accent); color:var(--accent-ink); border-color:var(--accent); font-weight:600; padding:10px 22px; }
+
+  .controls { display:flex; flex-wrap:wrap; gap:10px 16px; align-items:center; margin-bottom:10px; }
+  .seg { display:inline-flex; border:1px solid var(--line); border-radius:10px; overflow:hidden; background:var(--card); }
+  .seg button { border:0; border-radius:0; padding:8px 12px; background:transparent; color:var(--muted); }
+  .seg button[aria-pressed=true] { background:var(--accent); color:var(--accent-ink); }
+  .field { display:flex; align-items:center; gap:6px; color:var(--muted); font-size:.85rem; }
+  .field input { width:84px; font:inherit; padding:7px 9px; border-radius:8px; border:1px solid var(--line); background:var(--card); color:var(--ink); }
+  .field input.wide { width:130px; }
+  label.check { display:flex; align-items:center; gap:6px; font-size:.88rem; color:var(--ink); }
+
+  .examples { display:flex; flex-wrap:wrap; gap:6px; margin:4px 0 14px; align-items:center; }
+  .examples span { color:var(--muted); font-size:.82rem; margin-right:2px; }
+  .chip { background:var(--chip); border:0; border-radius:99px; padding:5px 11px; font-size:.82rem; color:var(--ink); }
+
+  .status { color:var(--muted); font-size:.85rem; min-height:1.3em; margin-bottom:8px; }
+  .status.err { color:var(--warn); }
+
+  .cols { display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr)); }
+  .col h2 { font-size:.95rem; margin:0 0 2px; }
+  .col .why { color:var(--muted); font-size:.78rem; margin-bottom:8px; min-height:2.3em; }
+  .timing { display:flex; height:6px; border-radius:3px; overflow:hidden; background:var(--chip); margin:4px 0 4px; }
+  .timing i { display:block; height:100%; }
+  .tlegend { color:var(--muted); font-size:.74rem; margin-bottom:10px; }
+
+  .card { display:grid; grid-template-columns:64px 1fr; gap:10px; background:var(--card); border:1px solid var(--line);
+    border-radius:12px; padding:10px; margin-bottom:8px; }
+  .thumb { width:64px; height:64px; border-radius:8px; background:var(--chip); object-fit:contain; }
+  .rank { color:var(--muted); font-size:.75rem; font-variant-numeric:tabular-nums; }
+  .title { font-weight:600; font-size:.9rem; display:-webkit-box; -webkit-line-clamp:2; line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; color:inherit; text-decoration:none; }
+  .title:hover { color:var(--accent); }
+  .meta { display:flex; flex-wrap:wrap; gap:4px 10px; color:var(--muted); font-size:.78rem; margin-top:3px; align-items:center; }
+  .price { color:var(--ink); font-weight:600; }
+  .tag { font-size:.68rem; padding:1px 6px; border-radius:99px; background:var(--chip); }
+  .tag.only { background:transparent; border:1px solid var(--good); color:var(--good); }
+  .empty { color:var(--muted); padding:30px 8px; text-align:center; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Toy Search</h1>
+  <div class="sub">890,837 products · runs on CPU · dense vectors + keyword (BM25) + reranker</div>
+</header>
+<main>
+  <form id="form">
+    <input type="search" id="q" placeholder="Try: remote control car for kids, lego star wars 75192, quiet toy for a baby…" autocomplete="off" autofocus>
+    <button class="primary" type="submit">Search</button>
+  </form>
+
+  <div class="controls">
+    <div class="seg" id="modes" role="group" aria-label="Search mode">
+      <button type="button" data-mode="dense" aria-pressed="false" title="Meaning only (embeddings)">Dense</button>
+      <button type="button" data-mode="bm25" aria-pressed="false" title="Exact words only (BM25)">Keyword</button>
+      <button type="button" data-mode="hybrid" aria-pressed="false" title="Dense + keyword, fused">Hybrid</button>
+      <button type="button" data-mode="hybrid_rerank" aria-pressed="true" title="Hybrid, then a reranker re-reads the top 50">Hybrid + rerank</button>
+    </div>
+    <label class="check"><input type="checkbox" id="compare"> Compare side by side</label>
+    <div class="field">Max price $ <input type="number" id="maxp" min="0" step="1" placeholder="any"></div>
+    <div class="field">Min rating <input type="number" id="minr" min="0" max="5" step="0.5" placeholder="any"></div>
+    <div class="field">Brand <input class="wide" type="text" id="brand" placeholder="exact name"></div>
+  </div>
+
+  <div class="examples" id="examples"><span>Examples:</span></div>
+  <div class="status" id="status"></div>
+  <div class="cols" id="cols"></div>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+const MODE_INFO = {
+  dense: ["Dense (meaning)", "Embeds the query and finds products with similar meaning. Misses exact model numbers."],
+  bm25: ["Keyword (BM25)", "Matches the words themselves. Exact on part numbers, blind to synonyms."],
+  hybrid: ["Hybrid", "Dense and keyword lists merged by reciprocal rank. Items both like rise."],
+  hybrid_rerank: ["Hybrid + rerank", "Hybrid, then a cross-encoder reads query and product together for the top 50."],
+};
+const STAGE_COLORS = {embed_query:"#8196f7", dense_search:"#5b7bf0", bm25_search:"#59c08b", fusion:"#c9a227", rerank:"#e29a63"};
+const EXAMPLES = ["remote control car for kids", "lego star wars 75192", "toy for a 3 year old who loves trucks",
+                  "quiet toy for a baby", "10 gram poker chips set", "dinosaur costume"];
+let mode = "hybrid_rerank";
+
+EXAMPLES.forEach(t => { const b = document.createElement("button"); b.type="button"; b.className="chip"; b.textContent=t;
+  b.onclick = () => { $("q").value = t; run(); }; $("examples").appendChild(b); });
+
+$("modes").addEventListener("click", e => {
+  const b = e.target.closest("button"); if (!b) return;
+  mode = b.dataset.mode;
+  [...$("modes").children].forEach(x => x.setAttribute("aria-pressed", x === b));
+  if ($("q").value.trim()) run();
+});
+$("compare").onchange = () => { $("modes").style.opacity = $("compare").checked ? .45 : 1; if ($("q").value.trim()) run(); };
+$("form").onsubmit = e => { e.preventDefault(); run(); };
+
+function params(m) {
+  const p = new URLSearchParams({ q: $("q").value.trim(), k: 10, mode: m });
+  if ($("maxp").value !== "") p.set("max_price", $("maxp").value);
+  if ($("minr").value !== "") p.set("min_rating", $("minr").value);
+  if ($("brand").value.trim()) p.set("brand", $("brand").value.trim());
+  return p;
+}
+
+async function fetchMode(m) {
+  const r = await fetch("/search?" + params(m));
+  const j = await r.json();
+  if (!r.ok) throw new Error(typeof j.detail === "string" ? j.detail : "Request failed");
+  return j;
+}
+
+async function run() {
+  const q = $("q").value.trim(); if (!q) return;
+  const modes = $("compare").checked ? ["dense", "bm25", "hybrid_rerank"] : [mode];
+  $("status").className = "status"; $("status").textContent = "Searching…";
+  const t0 = performance.now();
+  try {
+    const out = [];
+    for (const m of modes) out.push(await fetchMode(m));      // the server handles one search at a time anyway
+    render(modes, out);
+    const wall = Math.round(performance.now() - t0);
+    $("status").textContent = `${modes.length > 1 ? "3 searches" : "1 search"} · ${wall} ms round trip`;
+  } catch (e) { $("status").className = "status err"; $("status").textContent = e.message; $("cols").innerHTML = ""; }
+}
+
+function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; }
+
+function render(modes, responses) {
+  const cols = $("cols"); cols.innerHTML = "";
+  const sets = responses.map(r => new Set(r.results.map(x => x.pid)));
+  responses.forEach((resp, ci) => {
+    const col = el("section", "col");
+    col.appendChild(el("h2", null, MODE_INFO[modes[ci]][0]));
+    col.appendChild(el("div", "why", MODE_INFO[modes[ci]][1]));
+
+    const t = resp.timings_ms, stages = Object.keys(t).filter(k => k !== "total");
+    const bar = el("div", "timing");
+    stages.forEach(s => { const i = el("i"); i.style.width = (100 * t[s] / t.total) + "%"; i.style.background = STAGE_COLORS[s] || "#999"; i.title = `${s}: ${t[s]} ms`; bar.appendChild(i); });
+    col.appendChild(bar);
+    col.appendChild(el("div", "tlegend", `${Math.round(t.total)} ms server · ` + stages.map(s => `${s.replace("_search","").replace("_query"," query")} ${Math.round(t[s])}`).join(" · ")));
+
+    if (!resp.results.length) col.appendChild(el("div", "empty", "No products match."));
+    resp.results.forEach(r => {
+      const card = el("div", "card");
+      const img = el("img", "thumb"); img.loading = "lazy"; img.alt = ""; if (r.image) img.src = r.image; else img.style.visibility = "hidden";
+      img.onerror = () => { img.style.visibility = "hidden"; };
+      card.appendChild(img);
+      const body = el("div");
+      body.appendChild(el("div", "rank", "#" + r.rank));
+      const a = el("a", "title", r.title); a.href = "https://www.amazon.com/dp/" + r.pid; a.target = "_blank"; a.rel = "noopener noreferrer"; a.title = r.title;
+      body.appendChild(a);
+      const meta = el("div", "meta");
+      if (r.price != null) meta.appendChild(el("span", "price", "$" + r.price.toFixed(2)));
+      if (r.rating != null) meta.appendChild(el("span", null, "★ " + r.rating.toFixed(1)));
+      if (r.brand) meta.appendChild(el("span", null, r.brand));
+      if (r.category) meta.appendChild(el("span", null, r.category.split(" > ").slice(-1)[0]));
+      if (responses.length > 1) {                                  // flag products ONLY this method surfaced
+        const others = sets.filter((_, i) => i !== ci);
+        if (!others.some(s => s.has(r.pid))) meta.appendChild(el("span", "tag only", "only here"));
+      }
+      body.appendChild(meta); card.appendChild(body); col.appendChild(card);
+    });
+    cols.appendChild(col);
+  });
+}
+</script>
+</body>
+</html>
