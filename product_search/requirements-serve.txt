@@ -1,0 +1,13 @@
+# Runtime dependencies for SERVING the search API (no training / GPU / evaluation tools).
+# The HNSW and BM25 indexes were written by these exact versions; keep them pinned or the saved files may not load.
+faiss-cpu==1.15.1
+bm25s==0.3.11
+PyStemmer
+sentence-transformers>=6.1,<7
+transformers>=4.56
+numpy
+pandas
+pyarrow
+fastapi
+uvicorn
+httpx

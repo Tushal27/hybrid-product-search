@@ -8,3 +8,6 @@ translator/train.log
 product_search/data/
 product_search/index/
 *.log
+.history/
+.claude/
+image.png

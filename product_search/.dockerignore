@@ -1,0 +1,14 @@
+# Keep the image small: code only. Data and indexes are mounted as volumes at run time.
+data/
+index/
+tests/
+__pycache__/
+*.log
+*.json
+!tuned_settings.json
+bench_stages.py
+build_*.py
+download_data.py
+tune.py
+evaluate.py
+loadtest.py

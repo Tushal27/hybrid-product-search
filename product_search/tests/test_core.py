@@ -12,7 +12,7 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from engine import BM25Index, DenseIndex, SearchEngine, reciprocal_rank_fusion
+from engine import BM25Index, DenseIndex, SearchEngine, clean_text, reciprocal_rank_fusion
 from evaluate import mrr_at_k, ndcg_at_k, recall_at_k
 
 
@@ -93,6 +93,22 @@ class BM25Tests(unittest.TestCase):
     def test_unknown_word_returns_nothing(self):
         ids, _ = BM25Index(self.DOCS).search("zzzzqq", 3)
         self.assertEqual(len(ids), 0)
+
+
+class CleanTextTests(unittest.TestCase):
+    """Regression: a NaN brand/category (pandas 3 stores missing text as NaN) made the API return HTTP 500."""
+
+    def test_missing_values_become_none(self):
+        for missing in (None, float("nan"), np.nan, pd.NA):
+            self.assertIsNone(clean_text(missing))
+
+    def test_real_text_is_kept(self):
+        self.assertEqual(clean_text("LEGO"), "LEGO")
+        self.assertEqual(clean_text(""), "")
+
+    def test_result_is_json_serialisable(self):
+        import json
+        json.dumps({"brand": clean_text(float("nan")), "category": clean_text(np.nan) or ""}, allow_nan=False)
 
 
 class FilterTests(unittest.TestCase):

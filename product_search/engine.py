@@ -138,6 +138,12 @@ class Reranker:
 
 
 # ------------------------------------------------------------------ the engine
+def clean_text(value):
+    """Missing text -> None, whatever the pandas version. pandas 3 stores a missing string as NaN (a float),
+    pandas 2 as None; a NaN that reaches the JSON response makes the API crash with HTTP 500."""
+    return None if value is None or (isinstance(value, float) and value != value) or pd.isna(value) else str(value)
+
+
 @dataclass
 class SearchResult:
     pid: str
@@ -238,8 +244,8 @@ class SearchEngine:
 
         rows = self.catalog.iloc[[i for i, _ in ranked[:k]]]
         results = [
-            SearchResult(pid=r.pid, title=r.title, brand=r.brand, price=None if pd.isna(r.price) else float(r.price),
-                         rating=None if pd.isna(r.rating) else float(r.rating), category=r.category,
+            SearchResult(pid=r.pid, title=r.title, brand=clean_text(r.brand), price=None if pd.isna(r.price) else float(r.price),
+                         rating=None if pd.isna(r.rating) else float(r.rating), category=clean_text(r.category) or "",
                          score=float(s), rank=n + 1)
             for n, (r, (_, s)) in enumerate(zip(rows.itertuples(), ranked[:k]))
         ]
