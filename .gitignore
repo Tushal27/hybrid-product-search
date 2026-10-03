@@ -11,3 +11,4 @@ product_search/index/
 .history/
 .claude/
 image.png
+.playwright-mcp/

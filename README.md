@@ -26,9 +26,17 @@ flowchart LR
 
 Why three stages: dense vectors understand *meaning* ("toy for a 3 year old who loves trucks") but miss exact
 model numbers; BM25 nails "lego 75192" but misses synonyms; fusion combines them and a cross-encoder reads
-query and product together to order the best few. On the query `lego star wars 75192`, dense search returned
-other Lego sets, BM25 returned display stands that mention the number, and only the hybrid + rerank
-pipeline put the actual set first.
+query and product together to order the best few. On the query `lego star wars 75192` (screenshot below),
+dense search returned other Lego sets and none of the real Millennium Falcon 75192 sets, BM25 returned only
+accessories that mention the number (display stands, LED kits, a minifigure), and the hybrid + rerank pipeline
+was the only one to surface the actual 75192 sets, at ranks 5 and 6. That is far from ideal: with the original
+untuned settings the real set ranked 1st-2nd, and the tuned settings traded that for a small average gain. The
+tuned-vs-untuned difference on queries containing numbers was not statistically significant (60 such test queries).
+
+![Compare view: dense vs keyword vs hybrid + rerank for "lego star wars 75192"](docs/search-compare.png)
+
+The compare view shows each stage's contribution and where the time goes; results flagged "only here" were
+found by just one method.
 
 ### Search quality (497 held-out real shopper queries, human relevance labels from Amazon ESCI)
 
