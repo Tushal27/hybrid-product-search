@@ -1,5 +1,7 @@
 # LLM-MASTERY
 
+[![tests](https://github.com/Tushal27/LLM-MASTERY/actions/workflows/tests.yml/badge.svg)](https://github.com/Tushal27/LLM-MASTERY/actions/workflows/tests.yml)
+
 Hands-on LLM engineering, built from scratch and measured honestly: from tokenizers and attention up to a
 **hybrid semantic search service over 890,837 products that was load-tested and hardened for production traffic.**
 

@@ -26,7 +26,6 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).parent))
 sys.stdout.reconfigure(encoding="utf-8")
-from runtime import load_engine
 
 DATA = Path(__file__).parent / "data"
 
@@ -116,6 +115,7 @@ def main():
     if args.n:
         queries = queries[:args.n]
     print(f"{len(queries)} {args.split} queries")
+    from runtime import load_engine      # imported here, not at the top: the metric functions need no ML libraries (keeps tests/CI light)
     engine = load_engine(dense_kind=args.dense)
     engine.search("warmup", k=5, mode="hybrid_rerank")        # first call pays one-off setup costs
 

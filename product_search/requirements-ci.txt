@@ -1,0 +1,7 @@
+# What the unit tests need (no PyTorch / no models / no index files). Versions match requirements-serve.txt.
+faiss-cpu==1.15.1
+bm25s==0.3.11
+PyStemmer
+numpy
+pandas
+pyarrow

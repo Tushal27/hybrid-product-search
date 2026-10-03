@@ -1,0 +1,29 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: product_search/requirements-ci.txt
+
+      # Only the light libraries: the tests cover the metrics, rank fusion, FAISS/BM25 search, filters and the
+      # NaN regression. They need no PyTorch, no GPU and none of the 2 GB of index files.
+      - name: Install dependencies
+        run: pip install -r product_search/requirements-ci.txt
+
+      - name: Every module compiles
+        run: python -m compileall -q product_search translator
+
+      - name: Unit tests
+        run: python -m unittest discover -s product_search/tests -v
