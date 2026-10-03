@@ -15,6 +15,7 @@ Filters (price / rating / brand) are applied INSIDE the dense and BM25 searches
 """
 
 import json
+import threading
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -52,6 +53,15 @@ class DenseIndex:
         else:
             self.index = faiss.IndexFlatIP(self.dim)
         self.index.add(np.ascontiguousarray(vectors, dtype=np.float32))
+
+    @classmethod
+    def from_saved(cls, path, kind="hnsw", ef_search=128):
+        obj = cls.__new__(cls)
+        obj.index = faiss.read_index(str(path))
+        obj.kind, obj.n, obj.dim = kind, obj.index.ntotal, obj.index.d
+        if kind == "hnsw":
+            obj.index.hnsw.efSearch = ef_search
+        return obj
 
     def search(self, qvec, k, mask=None):
         params = None
@@ -116,9 +126,12 @@ def blend_scores(rerank_scores, fusion_scores, alpha):
 
 
 class Reranker:
-    def __init__(self, model_name=RERANK_MODEL, device="cpu", max_length=192):
+    def __init__(self, model_name=RERANK_MODEL, device="cpu", max_length=192, quantize=False):
         from sentence_transformers import CrossEncoder
         self.model = CrossEncoder(model_name, device=device, max_length=max_length)
+        if quantize:   # store Linear weights as int8, matmuls run in int8: faster on CPU, tiny accuracy cost (measured in bench_stages.py)
+            import torch    # in place on the underlying BERT: sentence-transformers 6 chains modules, so swapping `.model` breaks it
+            torch.quantization.quantize_dynamic(self.model.transformers_model, {torch.nn.Linear}, dtype=torch.qint8, inplace=True)
 
     def score(self, query, docs, batch_size=32):
         return self.model.predict([(query, d) for d in docs], batch_size=batch_size, show_progress_bar=False)
@@ -149,6 +162,10 @@ class SearchEngine:
 
     def __init__(self, catalog, dense, bm25, embedder, reranker=None):
         self.catalog, self.dense, self.bm25, self.embedder, self.reranker = catalog, dense, bm25, embedder, reranker
+        # HF fast tokenizers raise "Already borrowed" if two threads use one at once, so each model gets its own
+        # lock. FAISS and BM25 searches are thread-safe and run unlocked -- while request A is inside the
+        # reranker, request B can already be doing its dense + keyword search.
+        self._embed_lock, self._rerank_lock = threading.Lock(), threading.Lock()
         self._brand_lower = catalog["brand"].fillna("").str.lower().to_numpy()
         self._price = catalog["price"].to_numpy(dtype=float)       # NaN where unknown
         self._rating = catalog["rating"].to_numpy(dtype=float)
@@ -185,7 +202,8 @@ class SearchEngine:
 
         if mode in ("dense", "hybrid", "hybrid_rerank"):
             t0 = time.perf_counter()
-            qvec = self.embedder.encode_queries([query])[0]
+            with self._embed_lock:
+                qvec = self.embedder.encode_queries([query])[0]
             t["embed_query"] = (time.perf_counter() - t0) * 1000
             t0 = time.perf_counter()
             dense_ids, dense_scores = self.dense.search(qvec, pool, mask)
@@ -212,7 +230,8 @@ class SearchEngine:
             t0 = time.perf_counter()
             top = [i for i, _ in ranked[:rerank_top]]
             docs = (self.catalog["title"].iloc[top] + ". " + self.catalog["category"].iloc[top]).tolist()
-            rr = np.asarray(self.reranker.score(query, docs), dtype=float)
+            with self._rerank_lock:
+                rr = np.asarray(self.reranker.score(query, docs), dtype=float)
             final = blend_scores(rr, np.array([s for _, s in ranked[:rerank_top]]), rerank_blend)
             ranked = sorted(zip(top, map(float, final)), key=lambda kv: -kv[1]) + ranked[rerank_top:]
             t["rerank"] = (time.perf_counter() - t0) * 1000
