@@ -12,7 +12,6 @@ Usage:  python product_search/tune.py [--rerank-queries 600]
 """
 
 import argparse
-import itertools
 import json
 import sys
 import time

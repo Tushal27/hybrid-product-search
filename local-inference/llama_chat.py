@@ -2,7 +2,7 @@
 Chat with Qwen2.5 through llama.cpp -- the fast path on this machine.
 
 Why this is faster than qwen_chat.py (PyTorch): llama.cpp runs a 4-bit GGUF
-model (week3-memory-performance/05_gguf.py) with kernels that work on an old
+model (learning/week3-memory-performance/05_gguf.py) with kernels that work on an old
 GTX 1050 Ti, via Vulkan. ~60 tok/s for the 1.5B model vs ~15 with PyTorch.
 
 How it works: this script starts llama.cpp's own server (llama-server.exe) in
@@ -15,7 +15,7 @@ reused instead of recomputed (see the "cached" number in the stats line).
 Setup (already done): llama-cpp/ holds the llama.cpp binaries + the GGUF model.
 
 Usage:
-    python llama_chat.py
+    python local-inference/llama_chat.py
 """
 
 import atexit
@@ -28,7 +28,7 @@ from pathlib import Path
 
 sys.stdout.reconfigure(encoding="utf-8")
 
-LLAMA_DIR = Path(__file__).parent / "llama-cpp"
+LLAMA_DIR = Path(__file__).resolve().parent.parent / "llama-cpp"   # binaries + model live in <repo>/llama-cpp (git-ignored)
 MODEL_FILE = LLAMA_DIR / "models" / "qwen2.5-1.5b-instruct-q4_k_m.gguf"
 PORT = 8089
 CONTEXT = 4096          # tokens of prompt + reply the server keeps (VRAM is plentiful: model is ~1 GB)

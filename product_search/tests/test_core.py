@@ -75,7 +75,7 @@ class DenseTests(unittest.TestCase):
 
 
 class BM25Tests(unittest.TestCase):
-    DOCS = ["red toy fire truck", "blue toy submarine", "lego star wars millennium falcon 75192", "plush teddy bear"]
+    DOCS = ("red toy fire truck", "blue toy submarine", "lego star wars millennium falcon 75192", "plush teddy bear")
 
     def test_exact_model_number_found(self):
         ids, _ = BM25Index(self.DOCS).search("75192", 3)

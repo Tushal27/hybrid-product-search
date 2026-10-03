@@ -34,7 +34,7 @@ def calculator(expression):
         tree = ast.parse(expression, mode="eval")
         return _eval_node(tree.body)
     except (SyntaxError, ValueError, ZeroDivisionError, TypeError) as e:
-        raise ValueError(f"could not evaluate {expression!r}: {e}")
+        raise ValueError(f"could not evaluate {expression!r}: {e}") from e
 
 
 # ---------------------------------- unit conversion ----------------------------------

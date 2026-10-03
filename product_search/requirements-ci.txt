@@ -5,3 +5,4 @@ PyStemmer
 numpy
 pandas
 pyarrow
+ruff==0.16.10   # lint (config in the root pyproject.toml)

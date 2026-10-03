@@ -22,8 +22,11 @@ jobs:
       - name: Install dependencies
         run: pip install -r product_search/requirements-ci.txt
 
+      - name: Lint
+        run: ruff check product_search translator local-inference assistant docs
+
       - name: Every module compiles
-        run: python -m compileall -q product_search translator
+        run: python -m compileall -q product_search translator assistant local-inference learning
 
       - name: Unit tests
         run: python -m unittest discover -s product_search/tests -v

@@ -1,6 +1,6 @@
 """
 Persistent, semantically-retrieved memory -- the same mean-pooled-GloVe
-cosine-similarity technique from week5-production-ai/07_agent_memory.py,
+cosine-similarity technique from learning/week5-production-ai/07_agent_memory.py,
 now actually persisted to disk (data/memory.json) so facts survive
 between separate runs of the assistant, not just within one session.
 """

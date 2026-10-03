@@ -75,7 +75,7 @@ async def run_rate(client, url, queries, rate, duration, zipf, mode, timeout, rn
         if not ok:
             codes[st] = codes.get(st, 0) + 1
     return {
-        "rate": rate, "sent": n, "ok": int(len(lat)), "errors": n - int(len(lat)), "error_codes": codes,
+        "rate": rate, "sent": n, "ok": len(lat), "errors": n - len(lat), "error_codes": codes,
         "throughput": len(lat) / wall,
         "p50": float(np.percentile(lat, 50)) if len(lat) else None,
         "p95": float(np.percentile(lat, 95)) if len(lat) else None,
@@ -108,9 +108,11 @@ async def main():
         for rate in [float(x) for x in args.rates.split(",")]:
             r = await run_rate(client, args.url, queries, rate, args.duration, args.zipf, args.mode, args.timeout, rng)
             rows.append(r)
-            f = lambda v: f"{v:>9.0f}" if v is not None else f"{'-':>9}"
+            def fmt(v):
+                return f"{v:>9.0f}" if v is not None else f"{'-':>9}"
+
             print(f"{rate:>7.0f}{r['sent']:>6}{r['ok']:>6}{100 * r['errors'] / r['sent']:>6.1f}%{r['throughput']:>8.1f}"
-                  f"{f(r['p50'])}{f(r['p95'])}{f(r['p99'])}{f(r['max'])}"
+                  f"{fmt(r['p50'])}{fmt(r['p95'])}{fmt(r['p99'])}{fmt(r['max'])}"
                   + (f"   errors: {r['error_codes']}" if r["error_codes"] else ""), flush=True)
             await asyncio.sleep(2)                                              # let the server drain between steps
     if args.out:

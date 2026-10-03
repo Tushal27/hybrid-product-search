@@ -1,0 +1,18 @@
+{
+  "note": "Transcribed from the console output of product_search/evaluate.py (2026-10-03, 497 held-out ESCI toy queries, exact dense search, CPU). 95% CIs are bootstrapped over queries (2000 resamples). Per-query scores were not saved, so re-run evaluate.py to regenerate. Latency is wall-clock per query on the development laptop.",
+  "metric": "nDCG@10",
+  "n_queries": 497,
+  "rows": [
+    {"key": "bm25",                "label": "Keyword (BM25)",              "ndcg": 0.141, "ci": [0.122, 0.160], "p50_ms": 36,  "p95_ms": 51},
+    {"key": "dense",               "label": "Dense vectors",               "ndcg": 0.166, "ci": [0.147, 0.186], "p50_ms": 150, "p95_ms": 160},
+    {"key": "hybrid",              "label": "Hybrid (default weights)",    "ndcg": 0.164, "ci": [0.145, 0.184], "p50_ms": 211, "p95_ms": 248},
+    {"key": "hybrid_rerank",       "label": "Hybrid + rerank",             "ndcg": 0.176, "ci": [0.155, 0.197], "p50_ms": 515, "p95_ms": 657},
+    {"key": "hybrid_tuned",        "label": "Hybrid (tuned)",              "ndcg": 0.170, "ci": [0.151, 0.191], "p50_ms": 213, "p95_ms": 248},
+    {"key": "hybrid_rerank_tuned", "label": "Hybrid + rerank (tuned)",     "ndcg": 0.182, "ci": [0.162, 0.202], "p50_ms": 515, "p95_ms": 654}
+  ],
+  "paired_differences": [
+    {"a": "dense", "b": "hybrid_rerank_tuned", "mean": 0.0160, "ci": [0.0064, 0.0251], "distinguishable_from_noise": true},
+    {"a": "dense", "b": "hybrid_rerank",       "mean": 0.0097, "ci": [-0.0042, 0.0238], "distinguishable_from_noise": false},
+    {"a": "hybrid", "b": "hybrid_rerank",      "mean": 0.0116, "ci": [-0.0027, 0.0258], "distinguishable_from_noise": false}
+  ]
+}

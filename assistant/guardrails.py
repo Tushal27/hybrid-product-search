@@ -1,5 +1,5 @@
 """
-Guardrails -- same three layers as week5-production-ai/09_guardrails.py,
+Guardrails -- same three layers as learning/week5-production-ai/09_guardrails.py,
 now wired into a real application instead of a standalone demo.
 """
 

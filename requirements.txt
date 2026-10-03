@@ -1,0 +1,14 @@
+# Dependencies for the learning scripts, local inference, translator and assistant.
+# (The product search service has its own pinned lists: product_search/requirements-serve.txt and requirements-ci.txt.)
+# For GPU PyTorch, install torch from https://pytorch.org first, then run: pip install -r requirements.txt
+numpy
+regex
+tiktoken
+matplotlib
+scikit-learn
+gensim
+torch
+transformers
+datasets
+sacrebleu
+flask

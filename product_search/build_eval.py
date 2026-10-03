@@ -49,7 +49,7 @@ for split in ("train", "test"):
         if (g["esci_label"] == "Exact").any():
             queries.append({
                 "split": split, "query_id": int(qid), "query": g["query"].iloc[0],
-                "judgments": {p: GAIN[l] for p, l in zip(g["product_id"], g["esci_label"])},
+                "judgments": {p: GAIN[label] for p, label in zip(g["product_id"], g["esci_label"])},
             })
     print(f"{split}: {df['query_id'].nunique():,} US queries -> {sum(q['split'] == split for q in queries):,} toy queries kept")
 

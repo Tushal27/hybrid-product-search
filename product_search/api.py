@@ -28,7 +28,7 @@ import threading
 import time
 from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import Literal, Optional
+from typing import Literal
 
 import numpy as np
 import uvicorn
@@ -88,10 +88,10 @@ class SearchRequest(BaseModel):
     q: str = Field(min_length=1, max_length=300)
     k: int = Field(10, ge=1, le=100)
     mode: Mode = "hybrid_rerank"
-    min_price: Optional[float] = Field(None, ge=0)
-    max_price: Optional[float] = Field(None, ge=0)
-    min_rating: Optional[float] = Field(None, ge=0, le=5)
-    brand: Optional[str] = Field(None, max_length=100)
+    min_price: float | None = Field(None, ge=0)
+    max_price: float | None = Field(None, ge=0)
+    min_rating: float | None = Field(None, ge=0, le=5)
+    brand: str | None = Field(None, max_length=100)
 
     def cache_key(self):
         return (" ".join(self.q.lower().split()), self.k, self.mode, self.min_price, self.max_price,
@@ -195,8 +195,8 @@ def get_stats():
 
 @app.get("/search")
 def search_get(q: str = Query(..., min_length=1, max_length=300), k: int = Query(10, ge=1, le=100), mode: Mode = "hybrid_rerank",
-               min_price: Optional[float] = Query(None, ge=0), max_price: Optional[float] = Query(None, ge=0),
-               min_rating: Optional[float] = Query(None, ge=0, le=5), brand: Optional[str] = Query(None, max_length=100)):
+               min_price: float | None = Query(None, ge=0), max_price: float | None = Query(None, ge=0),
+               min_rating: float | None = Query(None, ge=0, le=5), brand: str | None = Query(None, max_length=100)):
     if q.strip() == "":
         raise HTTPException(422, "q must not be blank")
     return run_search(SearchRequest(q=q, k=k, mode=mode, min_price=min_price, max_price=max_price,

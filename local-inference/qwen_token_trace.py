@@ -12,7 +12,7 @@ Nothing here is hidden behind model.generate(): the loop below calls the
 model for raw logits and does every step by hand, so every number you'd
 otherwise never see is printed.
 
-USES A REAL KV CACHE (week3-memory-performance/02_kv_cache.py's exact
+USES A REAL KV CACHE (learning/week3-memory-performance/02_kv_cache.py's exact
 idea, now via the real model's built-in `past_key_values` instead of a
 from-scratch numpy version): the first call processes the whole prompt
 once (the "prefill" step); every step after that feeds in ONLY the one
@@ -22,7 +22,7 @@ every time. Without this, generating N tokens costs O(N^2) -- exactly
 what made the earlier 150-token run slow.
 
 Usage:
-    python qwen_token_trace.py
+    python local-inference/qwen_token_trace.py
 """
 
 import sys

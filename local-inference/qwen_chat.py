@@ -17,7 +17,7 @@ as ordinary eager code. On a GTX 1050 Ti this is ~2.5x faster than generate().
 Falls back to a plain eager loop on CPU.
 
 Usage:
-    python qwen_chat.py
+    python local-inference/qwen_chat.py
 """
 
 import sys
@@ -154,7 +154,7 @@ while True:
     first_token_time = None
     n_new = 0
     chunks = []
-    for chunk, n_new in stream_reply(input_ids):
+    for chunk, n_new in stream_reply(input_ids):  # noqa: B007  (n_new is read after the loop, for the stats line)
         if first_token_time is None:
             first_token_time = time.perf_counter()
         print(chunk, end="", flush=True)

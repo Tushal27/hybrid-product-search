@@ -45,9 +45,7 @@ def translate_route():
     french = iter(translate(tokenizer, model, sentences))
     out = []
     for p in pieces:
-        if p is None:
-            out.append("\n")
-        elif p == "\n":
+        if p is None or p == "\n":
             out.append("\n")
         else:
             out.append(next(french) + " ")

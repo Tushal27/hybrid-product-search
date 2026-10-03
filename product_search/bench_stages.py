@@ -20,7 +20,7 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).parent))
 sys.stdout.reconfigure(encoding="utf-8")
-from engine import DenseIndex, INDEX_DIR, Reranker, blend_scores, reciprocal_rank_fusion
+from engine import INDEX_DIR, Reranker, blend_scores, reciprocal_rank_fusion
 from evaluate import ndcg_at_k
 from runtime import load_engine
 
@@ -86,7 +86,7 @@ def main():
     # ------------------------------------------------------------ Part 2: reranker variants
     print("\nPart 2: reranker variants (fusion = tuned settings; candidates come from HNSW + BM25)")
     cands = []
-    for q, qv, d_ids in zip(queries, qvecs, res["hnsw"]):
+    for q, d_ids in zip(queries, res["hnsw"]):
         b_ids, _ = engine.bm25.search(q["query"], 100)
         cands.append(reciprocal_rank_fusion([d_ids, b_ids], [TUNED["dense_weight"], TUNED["bm25_weight"]], k=TUNED["rrf_k"])[:100])
 

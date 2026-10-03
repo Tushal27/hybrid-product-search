@@ -1,0 +1,8 @@
+# Normalise line endings so the repo looks the same on Windows, macOS and Linux
+* text=auto eol=lf
+*.png binary
+*.parquet binary
+*.faiss binary
+*.npy binary
+*.gguf binary
+*.pdf binary

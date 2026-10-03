@@ -1,0 +1,13 @@
+[tool.ruff]
+line-length = 150
+target-version = "py312"
+extend-exclude = ["learning", "llama-cpp", ".venv"]   # the weekly learning scripts are teaching code, linted separately if at all
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "B", "UP", "SIM", "RUF"]   # pycodestyle, pyflakes, bugbear, pyupgrade, simplify, ruff-specific
+ignore = [
+  "E402",    # imports after sys.path.insert(...) are intentional in the CLI scripts
+  "RUF001", "RUF002", "RUF003",   # typographic characters (arrows, dashes) in comments/strings are intentional
+  "SIM108", "SIM105", "B905",
+  "E501",    # line length: long HTML/CSS strings and result tables are intentional
+]

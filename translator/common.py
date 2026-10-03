@@ -1,6 +1,6 @@
 """
 Shared pieces for the English -> French translator: the base model, the
-prompt format, a hand-written LoRA layer (same idea as week4-modern-llms/
+prompt format, a hand-written LoRA layer (same idea as learning/week4-modern-llms/
 03_lora.py, but wrapped around the real Qwen model's nn.Linear layers), and
 a batched translate() used by training, evaluation, and the web app.
 """

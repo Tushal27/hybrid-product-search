@@ -158,7 +158,7 @@ def handle_turn(query, memory: Memory, ask_fn, confirm_fn=None):
 
     def _force_direct_answer(safeguard_note, reask_note):
         trace.append(("safeguard", safeguard_note))
-        followup = messages + [{"role": "user", "content": reask_note}]
+        followup = [*messages, {"role": "user", "content": reask_note}]
         final_raw = ask_fn(followup)
         trace.append(("model call 2 (raw output)", final_raw.strip()))
 
@@ -223,7 +223,7 @@ def handle_turn(query, memory: Memory, ask_fn, confirm_fn=None):
         result = f"error: {e}"
     trace.append(("tool executed", f"{tool_name}({arguments}) -> {result!r}"))
 
-    followup = messages + [
+    followup = [*messages,
         {"role": "assistant", "content": raw.strip()},
         {"role": "user", "content": f"Tool result: {result}. Answer the original request in one "
                                      f"short sentence using this exact result."},

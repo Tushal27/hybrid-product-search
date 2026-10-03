@@ -135,7 +135,8 @@ def main():
     print_table(rows)
     print_paired(rows)
     out = [{k: v for k, v in r.items() if not k.startswith("_")} for r in rows]
-    (Path(__file__).parent / "results.json").write_text(json.dumps({"split": args.split, "dense": args.dense, "tuned": tuned, "rows": out}, indent=2))
+    (Path(__file__).parent / "results").mkdir(exist_ok=True)
+    (Path(__file__).parent / "results" / "quality_eval_run.json").write_text(json.dumps({"split": args.split, "dense": args.dense, "tuned": tuned, "rows": out}, indent=2))
 
 
 if __name__ == "__main__":

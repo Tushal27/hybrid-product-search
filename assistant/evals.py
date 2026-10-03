@@ -1,5 +1,5 @@
 """
-Regression eval suite -- the week5-production-ai/10_ai_evaluation.py
+Regression eval suite -- the learning/week5-production-ai/10_ai_evaluation.py
 pattern, now protecting a real application instead of a demo. Run this
 after ANY change to agent.py, guardrails.py, or the prompts inside them,
 before trusting the change:
