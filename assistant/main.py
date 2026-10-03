@@ -1,6 +1,6 @@
 """
 Personal task/research assistant -- a real, standalone CLI application
-built on top of everything LLM-MASTERY's Week 5 taught: prompt design,
+built on top of everything the curriculum's Week 5 (learning/week5-production-ai) taught: prompt design,
 tool calling, persistent semantic memory, guardrails, and (see evals.py)
 an automated regression suite. Powered by Qwen2.5-0.5B-Instruct, running
 entirely locally.

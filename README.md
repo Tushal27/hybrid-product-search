@@ -1,11 +1,11 @@
-# LLM-MASTERY
+# Hybrid Product Search
 
-[![tests](https://github.com/Tushal27/LLM-MASTERY/actions/workflows/tests.yml/badge.svg)](https://github.com/Tushal27/LLM-MASTERY/actions/workflows/tests.yml)
+[![tests](https://github.com/Tushal27/hybrid-product-search/actions/workflows/tests.yml/badge.svg)](https://github.com/Tushal27/hybrid-product-search/actions/workflows/tests.yml)
 ![python](https://img.shields.io/badge/python-3.12-3776ab)
 ![license](https://img.shields.io/badge/license-MIT-green)
 
 **Hybrid semantic search over 890,837 products, evaluated against human relevance labels, load-tested, and hardened
-until it stopped collapsing under traffic.** Plus the from-scratch LLM work that led to it. Everything runs on one
+until it stopped collapsing under traffic.** Plus the from-scratch LLM work (the "LLM-MASTERY" curriculum) that led to it. Everything runs on one
 consumer laptop (GTX 1050 Ti, 16 GB RAM), and the numbers below are measured, including the unflattering ones.
 
 ![Compare view: dense vs keyword vs hybrid + rerank for "lego star wars 75192"](docs/search-compare.png)
